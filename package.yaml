@@ -1,0 +1,87 @@
+name:                quad
+version:             0.1.0.0
+github:              jeffhappily/quad
+license:             BSD3
+author:              Cheah Jer Fei
+maintainer:          goodboy96@live.com.my
+copyright:           2021 Cheah Jer Fei
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on Github at <https://github.com/jeffhappily/quad#readme>
+
+default-extensions:
+- BlockArguments
+- DeriveAnyClass
+- DeriveGeneric
+- LambdaCase
+- NoImplicitPrelude
+- OverloadedStrings
+- StrictData
+- RecordWildCards
+
+dependencies:
+- base >= 4.11 && < 10
+- rio >= 0.1.12.0
+- aeson
+- async
+- butcher
+- hslogger
+- http-client
+- http-conduit
+- http-types
+- network
+- scotty
+- serialise
+- stm
+- time
+- typed-process
+- wai-cors
+- yaml
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs: src
+
+executables:
+  quad-exe:
+    main:                Main.hs
+    source-dirs:         app
+    dependencies:
+    - quad
+    - optparse-simple
+
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+
+tests:
+  quad-test:
+    main:                Spec.hs
+    source-dirs:         test
+    dependencies:
+    - quad
+    - hspec
+
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
