@@ -47,6 +47,7 @@ dependencies:
 - typed-process
 - wai-cors
 - yaml
+- semver
 
 ghc-options:
 - -Wall

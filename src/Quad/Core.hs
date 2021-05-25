@@ -1,7 +1,7 @@
 module Quad.Core where
 
 import Import
-import Quad.Docker (ContainerExitCode (..), Image)
+import Quad.Docker (ContainerExitCode (..), CreateContainerOptions (CreateContainerOptions), Image, createContainer, startContainer)
 import RIO.List
 import qualified RIO.Map as Map
 
@@ -45,7 +45,7 @@ data StepResult
   | StepSucceeded
   deriving (Eq, Show)
 
--- | A CI build, consisting of a pipeline and the build state
+-- | A CI build, consisting of a pipeline, the build state and the completed steps
 data Build = Build
   { pipeline :: Pipeline,
     state :: BuildState,
@@ -53,22 +53,29 @@ data Build = Build
   }
   deriving (Eq, Show)
 
+-- | Return @StepResult@ according to the exit code
 exitCodeToStepResult :: ContainerExitCode -> StepResult
 exitCodeToStepResult exit =
   if exitCode exit == 0
     then StepSucceeded
     else StepFailed exit
 
-progress :: Build -> IO Build
+-- | Stepping the build forward, i.e., run the next step if available or end the build
+-- if failed
+progress :: Build -> QuadM Build
 progress build@Build {..} =
   case state of
     BuildReady ->
       case buildHasNextStep build of
         Left res ->
           pure $ build {state = BuildFinished res}
-        Right step ->
+        Right step -> do
+          let options = CreateContainerOptions (image step)
+          container <- createContainer options
+          startContainer container
+
           let s = BuildRunningState (name step)
-           in pure $ build {state = BuildRunning s}
+          pure $ build {state = BuildRunning s}
     BuildRunning BuildRunningState {..} ->
       -- Assume step run successfully
       let exit = ContainerExitCode 0
@@ -80,6 +87,8 @@ progress build@Build {..} =
               }
     BuildFinished _ -> pure build
 
+-- | Find the next step for the build, return either @BuildResult@ (build has finished)
+-- or the next step to run
 buildHasNextStep :: Build -> Either BuildResult Step
 buildHasNextStep Build {..} =
   if allSucceeded

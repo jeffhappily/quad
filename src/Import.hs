@@ -5,5 +5,6 @@ module Import
   )
 where
 
+import Quad.Types as X
 import RIO as X
 import RIO.Process as X

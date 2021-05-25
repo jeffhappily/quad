@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 868e503d55c3a05c16b9f327c3a3d29e101f092349efb1fd7129bc201d8f74fb
+-- hash: 7181db82b2fdd581518c4b8e9829cbe4b6777535eb6cd09be5127f09d8c0f42e
 
 name:           quad
 version:        0.1.0.0
@@ -50,6 +50,7 @@ library
     , network
     , rio >=0.1.12.0
     , scotty
+    , semver
     , serialise
     , stm
     , time
@@ -80,6 +81,7 @@ executable quad-exe
     , quad
     , rio >=0.1.12.0
     , scotty
+    , semver
     , serialise
     , stm
     , time
@@ -92,7 +94,6 @@ test-suite quad-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      UtilSpec
       Paths_quad
   hs-source-dirs:
       test
@@ -112,6 +113,7 @@ test-suite quad-test
     , quad
     , rio >=0.1.12.0
     , scotty
+    , semver
     , serialise
     , stm
     , time

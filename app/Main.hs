@@ -7,7 +7,7 @@ import Import
 import Options.Applicative.Simple
 import qualified Paths_quad
 import Quad
-import Quad.Types
+import Quad.Docker
 
 main :: IO ()
 main = do
@@ -26,11 +26,14 @@ main = do
       empty
   lo <- logOptionsHandle stderr (optionsVerbose options)
   pc <- mkDefaultProcessContext
+  -- the default docker socket is at /var/run/docker.sock
+  manager <- newUnixManager "/var/run/docker.sock"
   withLogFunc lo $ \lf ->
     let app =
           App
             { appLogFunc = lf,
               appProcessContext = pc,
-              appOptions = options
+              appOptions = options,
+              appHttpManager = manager
             }
      in runRIO app run

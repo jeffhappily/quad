@@ -2,7 +2,11 @@
 
 module Quad.Types where
 
-import Import
+import qualified Network.HTTP.Client as Http
+import RIO
+import RIO.Process
+
+type QuadM = RIO App
 
 -- | Command line arguments
 data Options = Options
@@ -12,8 +16,8 @@ data Options = Options
 data App = App
   { appLogFunc :: !LogFunc,
     appProcessContext :: !ProcessContext,
-    appOptions :: !Options
-    -- Add other app-specific configuration information here
+    appOptions :: !Options,
+    appHttpManager :: !Http.Manager
   }
 
 instance HasLogFunc App where
