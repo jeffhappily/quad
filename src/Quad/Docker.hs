@@ -2,12 +2,13 @@ module Quad.Docker where
 
 import Data.Aeson
 import Data.SemVer
-import Import
 import qualified Network.HTTP.Client as Client
 import qualified Network.HTTP.Client.Internal as Client.Internal
 import qualified Network.HTTP.Simple as HTTP
 import qualified Network.Socket as S
 import qualified Network.Socket.ByteString as SBS
+import Quad.Types (App (appHttpManager), QuadM)
+import RIO
 
 -- | Container image
 newtype Image = Image
@@ -41,16 +42,16 @@ buildPath path = encodeUtf8 $toText dockerVersion <> path
 
 -- | Create a docker container by sending a request to docker socket
 createContainer :: CreateContainerOptions -> QuadM ContainerId
-createContainer CreateContainerOptions {..} = do
+createContainer opts = do
   manager <- asks appHttpManager
-  let img = imageText image
+  let img = imageText opts.image
   let body =
         object
-          [ ("Image", toJSON img),
-            ("Tty", toJSON True),
-            ("Labels", object [("quad", "")]),
-            ("Cmd", "echo hello"),
-            ("Entrypoint", toJSON [String "/bin/sh", "-c"])
+          [ ("Image", toJSON img)
+          , ("Tty", toJSON True)
+          , ("Labels", object [("quad", "")])
+          , ("Cmd", "echo hello")
+          , ("Entrypoint", toJSON [String "/bin/sh", "-c"])
           ]
   let req =
         HTTP.defaultRequest
@@ -74,25 +75,26 @@ startContainer (ContainerId cId) = do
 
   void $ HTTP.httpBS req
 
--- | Create a new @Manager@ for connections to a unix domain socket
---
--- Referencing https://github.com/denibertovic/docker-hs/blob/35e43156e4f3a0df483a262407967e17ab15217b/src/Docker/Client/Http.hs#L136-L159
+{- | Create a new @Manager@ for connections to a unix domain socket
+
+ Referencing https://github.com/denibertovic/docker-hs/blob/35e43156e4f3a0df483a262407967e17ab15217b/src/Docker/Client/Http.hs#L136-L159
+-}
 newUnixManager :: FilePath -> IO Client.Manager
 newUnixManager fp = do
   Client.newManager $
     Client.defaultManagerSettings
       { Client.managerRawConnection = pure openUnixSocket
       }
-  where
-    -- Docker seems to ignore the hostname in requests sent over unix domain
-    -- sockets (and the port obviously doesn't matter either)
-    openUnixSocket _ _ _ = do
-      s <- S.socket S.AF_UNIX S.Stream S.defaultProtocol
-      S.connect s (S.SockAddrUnix fp)
-      Client.Internal.makeConnection
-        (SBS.recv s 8096)
-        (SBS.sendAll s)
-        (S.close s)
+ where
+  -- Docker seems to ignore the hostname in requests sent over unix domain
+  -- sockets (and the port obviously doesn't matter either)
+  openUnixSocket _ _ _ = do
+    s <- S.socket S.AF_UNIX S.Stream S.defaultProtocol
+    S.connect s (S.SockAddrUnix fp)
+    Client.Internal.makeConnection
+      (SBS.recv s 8096)
+      (SBS.sendAll s)
+      (S.close s)
 
 -- | Parse HTTP response into a FromJSON instance
 parseHTTPResponse :: (MonadIO m, FromJSON a) => HTTP.Response ByteString -> m a

@@ -1,8 +1,15 @@
 module Quad.Core where
 
-import Import
-import Quad.Docker (ContainerExitCode (..), CreateContainerOptions (CreateContainerOptions), Image, createContainer, startContainer)
-import RIO.List
+import Quad.Docker (
+  ContainerExitCode (..),
+  CreateContainerOptions (CreateContainerOptions),
+  Image,
+  createContainer,
+  startContainer,
+ )
+import Quad.Types (QuadM)
+import RIO
+import qualified RIO.List as List
 import qualified RIO.Map as Map
 
 newtype StepName = StepName
@@ -18,9 +25,9 @@ newtype Pipeline = Pipeline
 
 -- | A list of commands to run in @image@
 data Step = Step
-  { name :: StepName,
-    commands :: NonEmpty Text,
-    image :: Image
+  { name :: StepName
+  , commands :: NonEmpty Text
+  , image :: Image
   }
   deriving (Eq, Show)
 
@@ -47,9 +54,9 @@ data StepResult
 
 -- | A CI build, consisting of a pipeline, the build state and the completed steps
 data Build = Build
-  { pipeline :: Pipeline,
-    state :: BuildState,
-    completedSteps :: Map StepName StepResult
+  { pipeline :: Pipeline
+  , state :: BuildState
+  , completedSteps :: Map StepName StepResult
   }
   deriving (Eq, Show)
 
@@ -60,43 +67,45 @@ exitCodeToStepResult exit =
     then StepSucceeded
     else StepFailed exit
 
--- | Stepping the build forward, i.e., run the next step if available or end the build
--- if failed
+{- | Stepping the build forward, i.e., run the next step if available or end the build
+ if failed
+-}
 progress :: Build -> QuadM Build
-progress build@Build {..} =
-  case state of
+progress build =
+  case build.state of
     BuildReady ->
       case buildHasNextStep build of
         Left res ->
-          pure $ build {state = BuildFinished res}
+          pure build{state = BuildFinished res}
         Right step -> do
-          let options = CreateContainerOptions (image step)
+          let options = CreateContainerOptions step.image
           container <- createContainer options
           startContainer container
 
           let s = BuildRunningState (name step)
-          pure $ build {state = BuildRunning s}
-    BuildRunning BuildRunningState {..} ->
+          pure build{state = BuildRunning s}
+    BuildRunning state ->
       -- Assume step run successfully
       let exit = ContainerExitCode 0
           result = exitCodeToStepResult exit
        in pure $
             build
-              { state = BuildReady,
-                completedSteps = Map.insert step result completedSteps
+              { state = BuildReady
+              , completedSteps = Map.insert state.step result build.completedSteps
               }
     BuildFinished _ -> pure build
 
--- | Find the next step for the build, return either @BuildResult@ (build has finished)
--- or the next step to run
+{- | Find the next step for the build, return either @BuildResult@ (build has finished)
+ or the next step to run
+-}
 buildHasNextStep :: Build -> Either BuildResult Step
-buildHasNextStep Build {..} =
+buildHasNextStep build =
   if allSucceeded
     then case nextStep of
       Just step -> Right step
       Nothing -> Left BuildSucceeded
     else Left BuildFailed
-  where
-    allSucceeded = all (== StepSucceeded) completedSteps
-    nextStep = find notRunned (steps pipeline)
-    notRunned Step {..} = not $ Map.member name completedSteps
+ where
+  allSucceeded = List.all (== StepSucceeded) build.completedSteps
+  nextStep = List.find notRunned build.pipeline.steps
+  notRunned step = not $ Map.member step.name build.completedSteps

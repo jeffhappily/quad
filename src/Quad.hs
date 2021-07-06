@@ -3,8 +3,8 @@
 
 module Quad (run) where
 
-import Import
-import Quad.Types
+import Quad.Types (App)
+import RIO
 
 run :: RIO App ()
 run = do

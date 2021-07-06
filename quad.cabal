@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ee97c8dbc72a663753a934f92c322f4eda8c4a2596dd4dd0b582bd74d5d4827b
+-- hash: 7ae7aa627e3bb767d1c438b13320eaf0935897ee0b8a4f24575f55550532153e
 
 name:           quad
 version:        0.1.0.0
@@ -27,7 +27,6 @@ source-repository head
 
 library
   exposed-modules:
-      Import
       Quad
       Quad.Core
       Quad.Docker
@@ -44,8 +43,7 @@ library
       NoImplicitPrelude
       OverloadedStrings
       StrictData
-      RecordWildCards
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -F -pgmF=record-dot-preprocessor
   build-depends:
       aeson
     , async
@@ -56,6 +54,7 @@ library
     , http-conduit
     , http-types
     , network
+    , record-hasfield
     , rio >=0.1.12.0
     , scotty
     , semver
@@ -81,8 +80,7 @@ executable quad-exe
       NoImplicitPrelude
       OverloadedStrings
       StrictData
-      RecordWildCards
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -F -pgmF=record-dot-preprocessor -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
     , async
@@ -95,6 +93,7 @@ executable quad-exe
     , network
     , optparse-simple
     , quad
+    , record-hasfield
     , rio >=0.1.12.0
     , scotty
     , semver
@@ -121,8 +120,7 @@ test-suite quad-test
       NoImplicitPrelude
       OverloadedStrings
       StrictData
-      RecordWildCards
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -F -pgmF=record-dot-preprocessor -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
     , async
@@ -135,6 +133,7 @@ test-suite quad-test
     , http-types
     , network
     , quad
+    , record-hasfield
     , rio >=0.1.12.0
     , scotty
     , semver

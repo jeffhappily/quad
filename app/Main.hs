@@ -3,11 +3,13 @@
 
 module Main (main) where
 
-import Import
 import Options.Applicative.Simple
 import qualified Paths_quad
 import Quad
 import Quad.Docker
+import Quad.Types
+import RIO
+import RIO.Process (mkDefaultProcessContext)
 
 main :: IO ()
 main = do
@@ -31,9 +33,9 @@ main = do
   withLogFunc lo $ \lf ->
     let app =
           App
-            { appLogFunc = lf,
-              appProcessContext = pc,
-              appOptions = options,
-              appHttpManager = manager
+            { appLogFunc = lf
+            , appProcessContext = pc
+            , appOptions = options
+            , appHttpManager = manager
             }
      in runRIO app run
