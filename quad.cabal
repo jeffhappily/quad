@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7181db82b2fdd581518c4b8e9829cbe4b6777535eb6cd09be5127f09d8c0f42e
+-- hash: ee97c8dbc72a663753a934f92c322f4eda8c4a2596dd4dd0b582bd74d5d4827b
 
 name:           quad
 version:        0.1.0.0
@@ -36,7 +36,15 @@ library
       Paths_quad
   hs-source-dirs:
       src
-  default-extensions: BlockArguments DeriveAnyClass DeriveGeneric LambdaCase NoImplicitPrelude OverloadedStrings StrictData RecordWildCards
+  default-extensions:
+      BlockArguments
+      DeriveAnyClass
+      DeriveGeneric
+      LambdaCase
+      NoImplicitPrelude
+      OverloadedStrings
+      StrictData
+      RecordWildCards
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints
   build-depends:
       aeson
@@ -65,7 +73,15 @@ executable quad-exe
       Paths_quad
   hs-source-dirs:
       app
-  default-extensions: BlockArguments DeriveAnyClass DeriveGeneric LambdaCase NoImplicitPrelude OverloadedStrings StrictData RecordWildCards
+  default-extensions:
+      BlockArguments
+      DeriveAnyClass
+      DeriveGeneric
+      LambdaCase
+      NoImplicitPrelude
+      OverloadedStrings
+      StrictData
+      RecordWildCards
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
@@ -97,7 +113,15 @@ test-suite quad-test
       Paths_quad
   hs-source-dirs:
       test
-  default-extensions: BlockArguments DeriveAnyClass DeriveGeneric LambdaCase NoImplicitPrelude OverloadedStrings StrictData RecordWildCards
+  default-extensions:
+      BlockArguments
+      DeriveAnyClass
+      DeriveGeneric
+      LambdaCase
+      NoImplicitPrelude
+      OverloadedStrings
+      StrictData
+      RecordWildCards
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
